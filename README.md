@@ -1,61 +1,186 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ApplyMandu Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+ApplyMandu is a comprehensive job portal connecting employers and job seekers with rich features such as advanced job alerts, resume management, interview scheduling, chat functionality, and more. This repository contains the backend API service, built with **Laravel**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📈 Screenshots
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Homepage                                    | Job Seeker Login                                       | Employer Dashboard                                              | Admin Dashboard                                        |
+| ------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------ |
+| [![Homepage](./public/readme/homepage.png)](./public/readme/homepage.png) | [![Login](./public/readme/login-jobseeker.png)](./public/readme/login-jobseeker.png) | [![Employer](./public/readme/employer-dashboard.png)](./public/readme/employer-dashboard.png) | [![Admin](./public/readme/admin-dashboard.png)](./public/readme/admin-dashboard.png) |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 📁 Project Structure Overview
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+This project follows a modular Laravel architecture. Here's a summary of major directories and their purposes:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### ✅ Core Components
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* **Http/**
 
-## Laravel Sponsors
+  * `Controllers/`: All API endpoints, including authentication, dashboard, and admin.
+  * `Middleware/`: Custom request filters (roles, permissions, rate-limiting).
+  * `Requests/`: Form request validation.
+  * `Resources/`: API resource transformation for clean JSON output.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+* **Models/**
 
-### Premium Partners
+  * All Eloquent models representing the system's entities (Users, Jobs, Applications, etc.).
+  * Includes custom scopes for filtering queries.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+* **Enums/**
 
-## Contributing
+  * Enum-like classes (e.g., DegreeLevel) for type-safe value definitions.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+* **Events/** & **Listeners/**
 
-## Code of Conduct
+  * Implements Laravel's event-driven architecture (e.g., Job Alerts, Email Verification).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+* **Mail/**
 
-## Security Vulnerabilities
+  * Custom mailable classes for email notifications.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+* **Notifications/**
 
-## License
+  * Laravel notification classes for system alerts (e.g., new job matches).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+* **Jobs/** & **Services/**
+
+  * Asynchronous job processing (e.g., job alert matching).
+  * Service classes for encapsulating business logic.
+
+* **Helpers/**
+
+  * Utility classes for string manipulation, cache management, etc.
+
+* **Traits/**
+
+  * Shared logic (e.g., file uploads, authentication handling).
+
+* **Console/**
+
+  * Custom Artisan commands (e.g., `CreateAdminUser`).
+
+* **Providers/**
+
+  * Service providers to bootstrap application services.
+
+* **Constants/**
+
+  * Static class-based constants (e.g., Skills list).
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/applymandu-backend.git
+cd applymandu-backend
+```
+
+### 2. Install Dependencies
+
+```bash
+composer install
+```
+
+### 3. Configure Environment
+
+Copy the example environment file and update values as needed:
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+Update your `.env` file with:
+
+* Database credentials
+* Mail settings
+* API keys
+* Redis, queue, or cache settings (if used)
+
+### 4. Run Migrations
+
+```bash
+php artisan migrate
+```
+
+### 5. Seed Data (optional)
+
+```bash
+php artisan db:seed
+```
+
+### 6. Run the Development Server
+
+```bash
+php artisan serve
+```
+
+---
+
+## 🚀 Features
+
+* User authentication (Job Seekers, Employers, Admins)
+* Email verification and password reset
+* Job posting and management
+* Resume and profile management
+* Chat and messaging system
+* Role & permission middleware
+* Job alerts and recommendations
+* Interview scheduling and calendar events
+* Admin dashboard and impersonation
+* Rate limiting and API key management
+
+---
+
+## 📬 Scheduled Jobs & Queue
+
+This app uses Laravel queues and jobs. Make sure to run the queue worker if jobs like `JobAlertMatching` are scheduled:
+
+```bash
+php artisan queue:work
+```
+
+To schedule jobs (e.g., via cron):
+
+```bash
+* * * * * php /path-to-project/artisan schedule:run >> /dev/null 2>&1
+```
+
+---
+
+## 🧪 Testing
+
+Run test suite:
+
+```bash
+php artisan test
+```
+
+---
+
+## 📄 License
+
+This project is proprietary and all rights are reserved by ApplyMandu unless explicitly stated otherwise.
+
+---
+
+## 👨‍💼 Contributing
+
+1. Fork the repository
+2. Create a new branch: `git checkout -b feature/your-feature-name`
+3. Commit your changes: `git commit -am 'Add feature'`
+4. Push to the branch: `git push origin feature/your-feature-name`
+5. Open a pull request
+
+---
+
+## 📞 Contact
+
+For issues or feature requests, please reach out to the ApplyMandu dev team or file an issue on this repository.
