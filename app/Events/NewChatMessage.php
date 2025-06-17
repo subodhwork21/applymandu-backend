@@ -27,16 +27,25 @@ class NewChatMessage implements ShouldBroadcast
             'sender:id,image',
             'receiver:id,image'
         ]);
+
+        // Append image_path to sender and receiver
+        if ($this->chatMessage->sender) {
+            $this->chatMessage->sender->append('image_path');
+        }
+
+        if ($this->chatMessage->receiver) {
+            $this->chatMessage->receiver->append('image_path');
+        }
     }
 
-   
+
 
     /**
      * Get the channels the event should broadcast on.
      */
     public function broadcastOn(): array
     {
-        Log::info('Broadcasting message', ['chat_id' => $this->chatMessage->chat_id, 'message_id' => $this->chatMessage->id]);
+        // Log::info('Broadcasting message', ['chat_id' => $this->chatMessage->chat_id, 'message_id' => $this->chatMessage->id]);
 
         return [
             new PrivateChannel('chat.' . $this->chatMessage->chat_id),

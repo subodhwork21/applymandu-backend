@@ -1026,4 +1026,21 @@ class JobController extends Controller
     }
 
 
+    public function jobSEOInfo(Request $request, $slug)
+    {
+
+
+        $job = AmJob::select('id','title', 'slug', 'description')->with("employer", function($q){
+            $q->select('id', 'image');
+        })->where('slug', $slug)->firstOrFail();
+
+        if(!$job){
+            return response()->json([
+                'success' => false,
+                'message' => 'Job not found'
+            ], 404);
+        }
+
+        return new AmJobResource($job);
+    }
 }
