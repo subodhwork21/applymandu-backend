@@ -63,6 +63,7 @@ Route::get('job/expiring', [JobController::class, 'expiringJobs']);
 Route::get('job/search', [JobController::class, 'search']);
 
 Route::get("seo/job-info/{slug}", [JobController::class, 'jobSEOInfo']);
+Route::get("seo/job-slugs", [JobController::class, 'getJobSlugs']);
 
 // protected routes
 Route::middleware('auth:api')->group(function () {

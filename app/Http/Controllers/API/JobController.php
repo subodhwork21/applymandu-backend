@@ -1043,4 +1043,11 @@ class JobController extends Controller
 
         return new AmJobResource($job);
     }
+
+
+    public function getJobSlugs()
+    {
+        $jobSlugs = AmJob::pluck('slug');
+        return response()->json(['job_slugs' => $jobSlugs]);
+    }
 }
