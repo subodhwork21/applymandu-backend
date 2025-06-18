@@ -137,10 +137,10 @@ class JobController extends Controller
 
                 $subq->where('title', 'like', $search)
                     ->orWhere('description', 'like', $search)->orWhereHas("employer", function ($query) use ($search) {
-                        $query->where("company_name", "like", "%$search%");
+                        $query->where("company_name", "like", $search);
                     })->orWhereHas("skills", function ($query) use ($search) {
-                        $query->where('skills.name', 'like', "%$search%");
-                    })->orWhere("description", "like", "%$search%")->orWhere("department", "like", "%$search%");
+                        $query->where('skills.name', 'like', $search);
+                    })->orWhere("description", "like", $search)->orWhere("department", "like", $search)->orWhere("location", "like", $search);
                 // $subq->search($request->search);
             })
         );
@@ -671,6 +671,101 @@ class JobController extends Controller
         ], 200);
     }
 
+    private function getDepartmentDisplayName($department)
+    {
+        $departmentNames = [
+            'it' => 'Information Technology',
+            'engineering' => 'Engineering',
+            'design' => 'Design & Creative',
+            'marketing' => 'Marketing & Communications',
+            'sales' => 'Sales & Business Development',
+            'finance' => 'Finance & Accounting',
+            'hr' => 'Human Resources',
+            'operations' => 'Operations & Management',
+            'product' => 'Product Management',
+            'customer_support' => 'Customer Support',
+            'other' => 'Other'
+        ];
+
+        return $departmentNames[$department] ?? ucfirst(str_replace('_', ' ', $department));
+    }
+
+    public function departments()
+    {
+        $cacheKey = 'departments_with_stats';
+
+        return Cache::remember($cacheKey, now()->addHours(2), function () {
+            // Get all active jobs with their relationships
+            $jobs = AmJob::with(['skills'])
+                ->where('status', 1)
+                ->get();
+
+            $totalJobs = $jobs->count();
+
+            if ($totalJobs === 0) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                    'total_jobs' => 0
+                ]);
+            }
+
+            // Group jobs by department
+            $departmentStats = $jobs->groupBy('department')->map(function ($departmentJobs, $department) use ($totalJobs) {
+                $jobCount = $departmentJobs->count();
+                $percentage = round(($jobCount / $totalJobs) * 100, 1);
+
+                // Calculate salary statistics
+                $salariesMin = $departmentJobs->where('salary_min', '>', 0)->pluck('salary_min');
+                $salariesMax = $departmentJobs->where('salary_max', '>', 0)->pluck('salary_max');
+
+                $avgMinSalary = $salariesMin->count() > 0 ? round($salariesMin->avg()) : 0;
+                $avgMaxSalary = $salariesMax->count() > 0 ? round($salariesMax->avg()) : 0;
+
+                // Get top skills for this department
+                $skillCounts = [];
+                foreach ($departmentJobs as $job) {
+                    foreach ($job->skills as $skill) {
+                        $skillName = strtolower($skill->name);
+                        $skillCounts[$skillName] = ($skillCounts[$skillName] ?? 0) + 1;
+                    }
+                }
+
+                // Sort skills by count and get top 5
+                arsort($skillCounts);
+                $topSkills = array_slice($skillCounts, 0, 5, true);
+
+                return [
+                    'name' => $department,
+                    'key' => $department,
+                    'count' => $jobCount,
+                    'percentage' => $percentage,
+                    'salary_info' => [
+                        'avg_min_salary' => $avgMinSalary,
+                        'avg_max_salary' => $avgMaxSalary,
+                        'min_salary' => $salariesMin->count() > 0 ? $salariesMin->min() : 0,
+                        'max_salary' => $salariesMax->count() > 0 ? $salariesMax->max() : 0,
+                    ],
+                    'top_skills' => $topSkills,
+                    'recent_jobs_count' => $departmentJobs->where('posted_date', '>=', now()->subDays(7))->count(),
+                    'employment_types' => $departmentJobs->groupBy('employment_type')->map->count()->toArray(),
+                    'experience_levels' => $departmentJobs->groupBy('experience_level')->map->count()->toArray(),
+                ];
+            });
+
+            // Sort by job count (descending)
+            $sortedDepartments = $departmentStats->sortByDesc('count');
+
+            return response()->json([
+                'success' => true,
+                'data' => $sortedDepartments->toArray(),
+                'total_jobs' => $totalJobs,
+                'total_departments' => $sortedDepartments->count(),
+                'last_updated' => now()->toISOString()
+            ]);
+        });
+    }
+
 
     public function search(Request $request)
     {
@@ -1030,11 +1125,11 @@ class JobController extends Controller
     {
 
 
-        $job = AmJob::select('id','title', 'slug', 'description')->with("employer", function($q){
+        $job = AmJob::select('id', 'title', 'slug', 'description')->with("employer", function ($q) {
             $q->select('id', 'image');
         })->where('slug', $slug)->firstOrFail();
 
-        if(!$job){
+        if (!$job) {
             return response()->json([
                 'success' => false,
                 'message' => 'Job not found'
