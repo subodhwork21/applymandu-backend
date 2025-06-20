@@ -9,6 +9,6 @@
 <body>
     <h1>Hello, {{ $name }}!</h1>
     <p>Please reset your password by clicking the link below:</p>
-    <a href="{{ 'https://applymandu.vercel.app/reset-password/'.$token }}">Reset Password</a>
+    <a href="{{ 'https://applymandu.com/reset-password/'.$token }}">Reset Password</a>
 </body>
 </html>
