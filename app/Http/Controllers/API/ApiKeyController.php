@@ -84,7 +84,7 @@ class ApiKeyController extends Controller
      */
     public function show(ApiKey $apiKey): JsonResponse
     {
-        if ($apiKey->employer_id !== auth()->id()) {
+        if ($apiKey->employer_id != auth()->id()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized access to API key'
@@ -125,7 +125,7 @@ class ApiKeyController extends Controller
      */
     public function destroy(ApiKey $apiKey): JsonResponse
     {
-        if ($apiKey->employer_id !== auth()->id()) {
+        if ($apiKey->employer_id != auth()->id()) {
             return response()->json([
                 'error' => true,
                 'message' => 'Unauthorized access to API key'
@@ -153,7 +153,7 @@ class ApiKeyController extends Controller
      */
     public function regenerate(ApiKey $apiKey): JsonResponse
     {
-        if ($apiKey->employer_id !== auth()->id()) {
+        if ($apiKey->employer_id != auth()->id()) {
             return response()->json([
                 'error' => true,
                 'message' => 'Unauthorized access to API key'
@@ -186,7 +186,7 @@ class ApiKeyController extends Controller
      */
     public function toggleStatus(ApiKey $apiKey): JsonResponse
     {
-        if ($apiKey->employer_id !== auth()->id()) {
+        if ($apiKey->employer_id != auth()->id()) {
             return response()->json([
                 'error' => true,
                 'message' => 'Unauthorized access to API key'
@@ -389,7 +389,7 @@ class ApiKeyController extends Controller
             ], 401);
         }
 
-        if ($apiKey->employer_id !== auth()->id()) {
+        if ($apiKey->employer_id != auth()->id()) {
             return response()->json([
                 'error' => true,
                 'message' => 'API key does not belong to you'
