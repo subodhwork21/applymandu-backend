@@ -18,6 +18,7 @@ use App\Http\Controllers\API\AuthEmployerController;
 use App\Http\Controllers\API\ChatController;
 use App\Http\Controllers\API\DashboardEmployerController;
 use App\Http\Controllers\API\DashboardJobSeekerController;
+use App\Http\Controllers\API\Employer\AdvancedAnalyticsController;
 use App\Http\Controllers\API\Employer\ApplicationController as EmployerApplicationController;
 use App\Http\Controllers\API\Employer\ApplicationInterviewController;
 use App\Http\Controllers\API\Employer\ApplicationNoteController;
@@ -167,7 +168,39 @@ Route::middleware('auth:api')->group(function () {
             Route::post('update-settings', [AuthEmployerController::class, 'updateSettings']);
             Route::get('settings/all', [AuthEmployerController::class, 'employerSettings']);
             Route::post('2fa/update', [AuthEmployerController::class, 'employer2faUpdate']);
+
+
+          
         });
+
+          Route::prefix('analytics')->group(function () {
+                // Main analytics endpoint
+                Route::get('/', [AdvancedAnalyticsController::class, 'getAnalytics']);
+
+                // Export analytics data
+                Route::post('/export', [AdvancedAnalyticsController::class, 'exportAnalytics']);
+
+                // Individual job analytics
+                Route::get('/job/{jobId}', [AdvancedAnalyticsController::class, 'getJobAnalytics']);
+
+                // Applicant funnel analytics
+                Route::get('/funnel', [AdvancedAnalyticsController::class, 'getApplicantFunnel']);
+
+                // Competitor analysis
+                Route::get('/competitor', [AdvancedAnalyticsController::class, 'getCompetitorAnalysis']);
+
+                // Real-time analytics
+                Route::get('/realtime', [AdvancedAnalyticsController::class, 'getRealTimeAnalytics']);
+
+                // Application quality metrics
+                Route::get('/quality', [AdvancedAnalyticsController::class, 'getApplicationQualityMetrics']);
+
+                // Hiring pipeline analytics
+                Route::get('/pipeline', [AdvancedAnalyticsController::class, 'getHiringPipelineAnalytics']);
+
+                // Clear cache
+                Route::delete('/cache', [AdvancedAnalyticsController::class, 'clearAnalyticsCache']);
+            });
 
         Route::prefix('api-keys')->group(function () {
             Route::get('/', [ApiKeyController::class, 'index']);
@@ -364,4 +397,3 @@ Route::middleware(['checkRole:employer'])->prefix('advance')->group(function () 
     Route::get('/resume-search/{jobseekerId}', [ResumeSearchController::class, 'getCandidateProfile']);
     Route::post('/resume-search/update-notes', [ResumeSearchController::class, 'updateCandidateNotes']);
 });
-
